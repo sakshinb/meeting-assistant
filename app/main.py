@@ -539,6 +539,17 @@ async def get_dataset_info():
     }
 
 
+@app.get("/")
+async def root():
+    return {
+        "status": "ok",
+        "service": "Enterprise AI Meeting Assistant API",
+        "version": "2.0.0",
+        "docs": "/docs"
+    }
+
+
+@app.get("/health")
 @app.get("/api/health")
 async def health_check():
     """Health check endpoint."""
