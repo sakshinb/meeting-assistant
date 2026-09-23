@@ -43,9 +43,8 @@ with gr.Blocks(title="Enterprise AI Meeting Assistant API") as demo:
 
         btn.click(fn=process_audio_zero_gpu, inputs=[audio_in], outputs=[out_text])
 
-# Mount FastAPI routes onto Gradio's underlying app (Gradio stays the primary/root app,
-# which is required for the ZeroGPU startup scanner to detect @spaces.GPU functions)
-demo.app.mount("/api", fastapi_app)
+# Mount FastAPI app onto Gradio. `app` is the primary ASGI app.
+app = gr.mount_gradio_app(fastapi_app, demo, path="/ui")
 
 if __name__ == "__main__":
-    demo.launch(server_name="0.0.0.0", server_port=7860)
+    uvicorn.run(app, host="0.0.0.0", port=7860)
