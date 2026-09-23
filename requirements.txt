@@ -11,4 +11,3 @@ passlib
 bcrypt
 pyjwt
 gradio
-spaces
