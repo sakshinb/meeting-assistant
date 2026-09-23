@@ -1,25 +1,20 @@
 import sys
 import os
 import gradio as gr
-
-try:
-    import spaces
-    gpu_decorator = spaces.GPU
-except ImportError:
-    def gpu_decorator(func):
-        return func
+import spaces
 
 # Ensure root directory is in python path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from app.main import app as fastapi_app
 
-# ZeroGPU requires at least one @spaces.GPU decorated function
-@gpu_decorator
-def zero_gpu_pipeline_entrypoint(audio_path: str, **kwargs):
-    """ZeroGPU registered inference function."""
+# ZeroGPU AST scanner requires exact @spaces.GPU syntax at module top-level
+@spaces.GPU
+def process_audio_zero_gpu(audio_path: str, **kwargs):
+    """ZeroGPU registered GPU inference function."""
     from app.pipeline.runner import run_pipeline
     return run_pipeline(audio_path, **kwargs)
+
 
 # Create Gradio UI
 with gr.Blocks(title="Enterprise AI Meeting Assistant API") as demo:
