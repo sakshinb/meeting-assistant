@@ -1,5 +1,6 @@
 import sys
 import os
+import uvicorn
 import gradio as gr
 import spaces
 
