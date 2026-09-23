@@ -17,6 +17,13 @@ import uuid
 import numpy as np
 from typing import Optional, Callable
 
+try:
+    import spaces
+    gpu_decorator = spaces.GPU
+except ImportError:
+    def gpu_decorator(func):
+        return func
+
 from app.pipeline.audio_preprocessing import (
     preprocess_audio_file,
     SAMPLE_RATE,
@@ -25,6 +32,7 @@ from app.pipeline.transcriber import transcribe, word_error_rate, character_erro
 from app.pipeline.summarizer import MeetingTransformer, evaluate_summary
 
 
+@gpu_decorator
 def run_pipeline(
     audio_path: str,
     asr_model: str = "openai/whisper-small",
