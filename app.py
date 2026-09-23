@@ -8,12 +8,14 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from app.main import app as fastapi_app
 
-# ZeroGPU AST scanner requires exact @spaces.GPU syntax at module top-level
+# ZeroGPU requires exact @spaces.GPU syntax bound to a Gradio event listener
 @spaces.GPU
-def process_audio_zero_gpu(audio_path: str, **kwargs):
+def process_audio_zero_gpu(audio_file):
     """ZeroGPU registered GPU inference function."""
+    if not audio_file:
+        return "No audio file provided."
     from app.pipeline.runner import run_pipeline
-    return run_pipeline(audio_path, **kwargs)
+    return str(run_pipeline(audio_file))
 
 
 # Create Gradio UI
@@ -34,10 +36,18 @@ with gr.Blocks(title="Enterprise AI Meeting Assistant API") as demo:
         """
     )
 
+    with gr.Accordion("Test GPU Pipeline", open=False):
+        audio_in = gr.Audio(type="filepath", label="Upload Meeting Audio")
+        btn = gr.Button("Process Audio on ZeroGPU", variant="primary")
+        out_text = gr.Textbox(label="Result", lines=5)
+
+        btn.click(fn=process_audio_zero_gpu, inputs=[audio_in], outputs=[out_text])
+
 # Mount FastAPI app onto Gradio. `app` is the primary ASGI app.
 app = gr.mount_gradio_app(fastapi_app, demo, path="/ui")
 
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=7860)
+
 
