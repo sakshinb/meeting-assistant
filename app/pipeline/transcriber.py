@@ -42,11 +42,14 @@ def _normalize_model_name(model_name: str) -> str:
         return "openai/whisper-small"
 
 
-def _load_whisper(model_name: str = "openai/whisper-small"):
+def _load_whisper(model_name: str = "openai/whisper-tiny"):
     """Load (or re-use) a Whisper model + processor."""
     global _whisper_model, _whisper_processor, _whisper_model_name
 
     canonical_name = _normalize_model_name(model_name)
+    # Force whisper-tiny for low-memory environments (Render 512MB RAM limit)
+    if DEVICE == "cpu":
+        canonical_name = "openai/whisper-tiny"
 
     if _whisper_model is not None and _whisper_model_name == canonical_name:
         return _whisper_processor, _whisper_model
@@ -55,12 +58,15 @@ def _load_whisper(model_name: str = "openai/whisper-small"):
 
     print(f"[Transcriber] Loading {canonical_name} on {DEVICE}...")
     _whisper_processor = WhisperProcessor.from_pretrained(canonical_name)
-    _whisper_model = WhisperForConditionalGeneration.from_pretrained(canonical_name)
+    _whisper_model = WhisperForConditionalGeneration.from_pretrained(
+        canonical_name, low_cpu_mem_usage=True
+    )
     _whisper_model = _whisper_model.to(DEVICE)
     _whisper_model.eval()
     _whisper_model_name = canonical_name
     print(f"[Transcriber] {canonical_name} loaded.")
     return _whisper_processor, _whisper_model
+
 
 
 def transcribe(

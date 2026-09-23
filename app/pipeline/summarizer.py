@@ -25,9 +25,13 @@ _tokenizer = None
 _model_name = None
 
 
-def _load_flan_t5(model_name: str = "google/flan-t5-base"):
+def _load_flan_t5(model_name: str = "google/flan-t5-small"):
     """Load (or re-use) a FLAN-T5 model + tokenizer."""
     global _model, _tokenizer, _model_name
+
+    # Force flan-t5-small for low-memory CPU environments (Render 512MB limit)
+    if DEVICE == "cpu":
+        model_name = "google/flan-t5-small"
 
     if _model is not None and _model_name == model_name:
         return _tokenizer, _model
@@ -36,12 +40,15 @@ def _load_flan_t5(model_name: str = "google/flan-t5-base"):
 
     print(f"[Summarizer] Loading {model_name} on {DEVICE}...")
     _tokenizer = AutoTokenizer.from_pretrained(model_name)
-    _model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
+    _model = AutoModelForSeq2SeqLM.from_pretrained(
+        model_name, low_cpu_mem_usage=True
+    )
     _model = _model.to(DEVICE)
     _model.eval()
     _model_name = model_name
     print(f"[Summarizer] {model_name} loaded.")
     return _tokenizer, _model
+
 
 
 # ---------------------------------------------------------------------------

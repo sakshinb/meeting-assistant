@@ -246,12 +246,15 @@ def _run_pipeline_job(job_id: str, meeting_id: str, audio_path: str, config: dic
         jobs[job_id]["stage"] = f"Failed: {str(e)[:100]}"
 
     finally:
+        import gc
+        gc.collect()
         # Clean up temp file
         try:
             if os.path.exists(audio_path):
                 os.remove(audio_path)
         except Exception:
             pass
+
 
 
 # ---------------------------------------------------------------------------
