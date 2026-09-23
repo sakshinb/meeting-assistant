@@ -3,15 +3,14 @@ title: Enterprise AI Meeting Assistant Backend
 emoji: 🎙️
 colorFrom: blue
 colorTo: indigo
-sdk: gradio
-sdk_version: 4.44.0
-app_file: app.py
+sdk: docker
+app_port: 7860
 pinned: false
 ---
 
 # Enterprise AI Meeting Assistant — FastAPI Backend
 
-FastAPI backend API powering neural audio representation, Whisper ASR, and FLAN-T5 LLM summarization hosted on Hugging Face Spaces (Free Gradio SDK).
+FastAPI backend API powering neural audio representation, Whisper ASR, and FLAN-T5 LLM summarization.
 
 ## Endpoints
 
